@@ -13,11 +13,16 @@ export async function startStdioTransport(
 ) {
   // Check if we're using the default model without an API key
   if (config) {
-    const modelName = config.modelName || "google/gemini-2.0-flash";
-    const hasModelApiKey = config.modelApiKey || process.env.GEMINI_API_KEY;
+    const modelName = config.modelName || "gemini-2.0-flash";
+    const hasModelApiKey =
+      config.modelApiKey ||
+      process.env.GEMINI_API_KEY ||
+      process.env.GOOGLE_API_KEY;
 
     if (modelName.includes("gemini") && !hasModelApiKey) {
-      console.error(`Need to set GEMINI_API_KEY in your environment variables`);
+      console.error(
+        `Need to set GEMINI_API_KEY or GOOGLE_API_KEY in your environment variables`,
+      );
     }
   }
 
@@ -43,12 +48,11 @@ async function handleStreamable(
   }
 
   if (req.method === "POST") {
+    const sessionId = crypto.randomUUID();
     const transport = new StreamableHTTPServerTransport({
-      sessionIdGenerator: () => crypto.randomUUID(),
-      onsessioninitialized: (sessionId) => {
-        sessions.set(sessionId, transport);
-      },
+      sessionIdGenerator: () => sessionId,
     });
+    sessions.set(sessionId, transport);
     transport.onclose = () => {
       if (transport.sessionId) sessions.delete(transport.sessionId);
     };
@@ -66,6 +70,7 @@ export function startHttpTransport(
   hostname: string | undefined,
   serverList: ServerList,
 ) {
+  // In-memory Map of SHTTP sessions
   const streamableSessions = new Map<string, StreamableHTTPServerTransport>();
   const httpServer = http.createServer(async (req, res) => {
     if (!req.url) {

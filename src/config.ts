@@ -1,6 +1,7 @@
 import type { Cookie } from "playwright-core";
 import type { Config } from "../config.d.ts";
-import type { AvailableModel } from "./types/models.js";
+import { z } from "zod";
+import { AvailableModelSchema } from "@browserbasehq/stagehand";
 
 export type ToolCapability = "core" | string;
 
@@ -15,7 +16,7 @@ export type CLIOptions = {
   cookies?: Cookie[];
   browserWidth?: number;
   browserHeight?: number;
-  modelName?: typeof AvailableModel;
+  modelName?: z.infer<typeof AvailableModelSchema>;
   modelApiKey?: string;
   keepAlive?: boolean;
   experimental?: boolean;
@@ -35,7 +36,7 @@ const defaultConfig: Config = {
     browserHeight: 768,
   },
   cookies: undefined,
-  modelName: "google/gemini-2.0-flash", // Default Model
+  modelName: "gemini-2.0-flash", // Default Model
 };
 
 // Resolve final configuration by merging defaults, file config, and CLI options
@@ -46,7 +47,8 @@ export async function resolveConfig(cliOptions: CLIOptions): Promise<Config> {
 
   // --- Add Browserbase Env Vars ---
   if (!mergedConfig.modelApiKey) {
-    mergedConfig.modelApiKey = process.env.GEMINI_API_KEY;
+    mergedConfig.modelApiKey =
+      process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
   }
 
   // --------------------------------

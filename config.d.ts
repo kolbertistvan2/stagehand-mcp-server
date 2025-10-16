@@ -1,5 +1,5 @@
 import type { Cookie } from "playwright-core";
-import type { AvailableModelSchema } from "./src/types/models.js";
+import type { AvailableModelSchema } from "@browserbasehq/stagehand";
 
 export type Config = {
   /**
@@ -96,12 +96,12 @@ export type Config = {
    * The Model that Stagehand uses
    * Available models: OpenAI, Claude, Gemini, Cerebras, Groq, and other providers
    *
-   * @default "google/gemini-2.0-flash"
+   * @default "gemini-2.0-flash"
    */
-  modelName?: AvailableModelSchema;
+  modelName?: z.infer<typeof AvailableModelSchema>;
   /**
    * API key for the custom model provider
-   * Required when using a model other than the default google/gemini-2.0-flash
+   * Required when using a model other than the default gemini-2.0-flash
    */
   modelApiKey?: string;
   /**

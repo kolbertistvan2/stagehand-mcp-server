@@ -2,7 +2,7 @@
 
 [![smithery badge](https://smithery.ai/badge/@browserbasehq/mcp-browserbase)](https://smithery.ai/server/@browserbasehq/mcp-browserbase)
 
-![cover](assets/cover-mcp.png)
+![cover](assets/cover.png)
 
 [The Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) is an open protocol that enables seamless integration between LLM applications and external data sources and tools. Whether you're building an AI-powered IDE, enhancing a chat interface, or creating custom AI workflows, MCP provides a standardized way to connect LLMs with the context they need.
 
@@ -19,7 +19,6 @@ This server provides cloud browser automation capabilities using [Browserbase](h
 | Model Flexibility  | Supports multiple models (OpenAI, Claude, Gemini, and more) |
 | Vision Support     | Use annotated screenshots for complex DOMs                  |
 | Session Management | Create, manage, and close browser sessions                  |
-| Multi-Session      | Run multiple browser sessions in parallel                   |
 
 ## How to Setup
 
@@ -194,7 +193,7 @@ The Browserbase MCP server accepts the following command-line flags:
 | `--cookies [json]`         | JSON array of cookies to inject into the browser                            |
 | `--browserWidth <width>`   | Browser viewport width (default: 1024)                                      |
 | `--browserHeight <height>` | Browser viewport height (default: 768)                                      |
-| `--modelName <model>`      | The model to use for Stagehand (default: google/gemini-2.0-flash)           |
+| `--modelName <model>`      | The model to use for Stagehand (default: gemini-2.0-flash)                  |
 | `--modelApiKey <key>`      | API key for the custom model provider (required when using custom models)   |
 | `--experimental`           | Enable experimental features (default: false)                               |
 
@@ -386,13 +385,11 @@ The server provides access to screenshot resources:
 
 - **AI-Powered Automation**: Natural language commands for web interactions
 - **Multi-Model Support**: Works with OpenAI, Claude, Gemini, and more
-- **Advanced Session Management**: Single and multi-session support for parallel browser automation
 - **Screenshot Capture**: Full-page and element-specific screenshots
 - **Data Extraction**: Intelligent content extraction from web pages
 - **Proxy Support**: Enterprise-grade proxy capabilities
 - **Stealth Mode**: Advanced anti-detection features
 - **Context Persistence**: Maintain authentication and state across sessions
-- **Parallel Workflows**: Run multiple browser sessions simultaneously for complex automation tasks
 
 For more information about the Model Context Protocol, visit:
 

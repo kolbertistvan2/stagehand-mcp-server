@@ -1,6 +1,8 @@
 import * as dotenv from "dotenv";
 dotenv.config();
 
+import { randomUUID } from "crypto";
+
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import type { MCPToolsArray } from "./types/types.js";
@@ -8,16 +10,13 @@ import type { MCPToolsArray } from "./types/types.js";
 import { Context } from "./context.js";
 import type { Config } from "../config.d.ts";
 import { TOOLS } from "./tools/index.js";
-import { AvailableModelSchema } from "./types/models.js";
-import { PROMPTS, getPrompt } from "./mcp/prompts.js";
+import { AvailableModelSchema } from "@browserbasehq/stagehand";
 import { RESOURCE_TEMPLATES } from "./mcp/resources.js";
 
 import {
   ListResourcesRequestSchema,
   ReadResourceRequestSchema,
   ListResourceTemplatesRequestSchema,
-  ListPromptsRequestSchema,
-  GetPromptRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 
 const cookieSchema = z.object({
@@ -95,13 +94,13 @@ export const configSchema = z
       })
       .optional(),
     modelName: AvailableModelSchema.optional().describe(
-      "The model to use for Stagehand (default: google/gemini-2.0-flash)",
+      "The model to use for Stagehand (default: gemini-2.0-flash)",
     ), // Already an existing Zod Enum
     modelApiKey: z
       .string()
       .optional()
       .describe(
-        "API key for the custom model provider. Required when using a model other than the default google/gemini-2.0-flash",
+        "API key for the custom model provider. Required when using a model other than the default gemini-2.0-flash",
       ),
     experimental: z
       .boolean()
@@ -111,7 +110,7 @@ export const configSchema = z
   .refine(
     (data) => {
       // If a non-default model is explicitly specified, API key is required
-      if (data.modelName && data.modelName !== "google/gemini-2.0-flash") {
+      if (data.modelName && data.modelName !== "gemini-2.0-flash") {
         return data.modelApiKey !== undefined && data.modelApiKey.length > 0;
       }
       return true;
@@ -133,7 +132,7 @@ export default function ({ config }: { config: z.infer<typeof configSchema> }) {
 
   const server = new McpServer({
     name: "Browserbase MCP Server",
-    version: "2.0.0",
+    version: "2.2.0",
     description:
       "Cloud browser automation server powered by Browserbase and Stagehand. Enables LLMs to navigate websites, interact with elements, extract data, and capture screenshots using natural language commands.",
     capabilities: {
@@ -141,27 +140,20 @@ export default function ({ config }: { config: z.infer<typeof configSchema> }) {
         subscribe: true,
         listChanged: true,
       },
-      prompts: {
-        listChanged: true,
-      },
-      sampling: {},
     },
   });
 
   const internalConfig: Config = config as Config;
 
   // Create the context, passing server instance and config
-  const context = new Context(server.server, internalConfig);
+  const contextId = randomUUID();
+  const context = new Context(server.server, internalConfig, contextId);
 
   server.server.registerCapabilities({
     resources: {
       subscribe: true,
       listChanged: true,
     },
-    prompts: {
-      listChanged: true,
-    },
-    sampling: {},
   });
 
   // Add resource handlers
@@ -182,16 +174,6 @@ export default function ({ config }: { config: z.infer<typeof configSchema> }) {
       return { resourceTemplates: RESOURCE_TEMPLATES };
     },
   );
-
-  // Add prompt handlers
-  server.server.setRequestHandler(ListPromptsRequestSchema, async () => {
-    return { prompts: PROMPTS };
-  });
-
-  server.server.setRequestHandler(GetPromptRequestSchema, async (request) => {
-    const prompt = getPrompt(request.params.name);
-    return prompt;
-  });
 
   const tools: MCPToolsArray = [...TOOLS];
 
