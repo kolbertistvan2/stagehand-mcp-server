@@ -1,4 +1,5 @@
-import type { Stagehand, Browser, Page } from "@browserbasehq/stagehand";
+import type { Stagehand } from "@browserbasehq/stagehand";
+import type { Browser, Page } from "playwright-core";
 import { ImageContent, TextContent } from "@modelcontextprotocol/sdk/types.js";
 import { Tool } from "../tools/tool.js";
 import { InputType } from "../tools/tool.js";
@@ -23,8 +24,8 @@ export type CreateSessionParams = {
 };
 
 export type BrowserSession = {
-  browser: Browser;
-  page: Page;
+  browser: any; // v3 doesn't expose Browser directly
+  page: any; // v3 Page is CDP-based, not Playwright Page
   sessionId: string;
   stagehand: Stagehand;
 };

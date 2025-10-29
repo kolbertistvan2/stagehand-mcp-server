@@ -10,7 +10,6 @@ import type { MCPToolsArray } from "./types/types.js";
 import { Context } from "./context.js";
 import type { Config } from "../config.d.ts";
 import { TOOLS } from "./tools/index.js";
-import { AvailableModelSchema } from "@browserbasehq/stagehand";
 import { RESOURCE_TEMPLATES } from "./mcp/resources.js";
 
 import {
@@ -93,9 +92,10 @@ export const configSchema = z
           ),
       })
       .optional(),
-    modelName: AvailableModelSchema.optional().describe(
-      "The model to use for Stagehand (default: gemini-2.0-flash)",
-    ), // Already an existing Zod Enum
+    modelName: z
+      .string()
+      .optional()
+      .describe("The model to use for Stagehand (default: gemini-2.0-flash)"),
     modelApiKey: z
       .string()
       .optional()

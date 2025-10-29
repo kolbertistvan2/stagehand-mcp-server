@@ -47,10 +47,7 @@ async function handleObserve(
     try {
       const stagehand = await context.getStagehand();
 
-      const observations = await stagehand.page.observe({
-        instruction: params.instruction,
-        returnAction: params.returnAction,
-      });
+      const observations = await stagehand.observe(params.instruction);
 
       return {
         content: [

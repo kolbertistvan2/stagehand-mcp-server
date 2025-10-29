@@ -30,7 +30,7 @@ async function handleNavigate(
       }
       await page.goto(params.url, { waitUntil: "domcontentloaded" });
 
-      const sessionId = stagehand.browserbaseSessionID;
+      const sessionId = stagehand.browserbaseSessionId;
       if (!sessionId) {
         throw new Error("No Browserbase session ID available");
       }

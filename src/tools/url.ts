@@ -30,7 +30,11 @@ async function handleGetUrl(
       const stagehand = await context.getStagehand();
 
       // Get the current URL from the Playwright page
-      const currentUrl = stagehand.page.url();
+      const page = stagehand.context.activePage();
+      if (!page) {
+        throw new Error("No active page available");
+      }
+      const currentUrl = page.url();
 
       return {
         content: [

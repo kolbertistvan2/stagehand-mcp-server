@@ -1,4 +1,5 @@
-import { BrowserContext, Stagehand } from "@browserbasehq/stagehand";
+import { Stagehand } from "@browserbasehq/stagehand";
+import type { BrowserContext } from "playwright-core";
 import type { Config } from "../config.d.ts";
 import type { Cookie } from "playwright-core";
 import { clearScreenshotsForSession } from "./mcp/resources.js";
@@ -26,13 +27,7 @@ export const createStagehandInstance = async (
     env: "BROWSERBASE",
     apiKey,
     projectId,
-    modelName: params.modelName || config.modelName || "gemini-2.5-flash",
-    modelClientOptions: {
-      apiKey:
-        config.modelApiKey ||
-        process.env.GEMINI_API_KEY ||
-        process.env.GOOGLE_API_KEY,
-    },
+    model: params.modelName || config.modelName || "gemini-2.5-flash",
     ...(params.browserbaseSessionID && {
       browserbaseSessionID: params.browserbaseSessionID,
     }),
@@ -193,15 +188,13 @@ export class SessionManager {
         newSessionId,
       );
 
-      // Get the page and browser from Stagehand
-      const page = stagehand.page;
-      const browser = page.context().browser();
-
-      if (!browser) {
-        throw new Error("Failed to get browser from Stagehand page context");
+      // Get the page from Stagehand v3
+      const page = stagehand.context.activePage();
+      if (!page) {
+        throw new Error("Failed to get active page from Stagehand context");
       }
 
-      const browserbaseSessionId = stagehand.browserbaseSessionID;
+      const browserbaseSessionId = stagehand.browserbaseSessionId;
 
       if (!browserbaseSessionId) {
         throw new Error(
@@ -216,63 +209,23 @@ export class SessionManager {
         `[SessionManager] Browserbase Live Debugger URL: https://www.browserbase.com/sessions/${browserbaseSessionId}\n`,
       );
 
-      // Set up disconnect handler
-      browser.on("disconnected", () => {
-        process.stderr.write(
-          `[SessionManager] Disconnected: ${newSessionId}\n`,
-        );
-        this.browsers.delete(newSessionId);
-        if (
-          this.defaultBrowserSession &&
-          this.defaultBrowserSession.browser === browser
-        ) {
-          process.stderr.write(
-            `[SessionManager] Disconnected (default): ${newSessionId}\n`,
-          );
-          this.defaultBrowserSession = null;
-          // Reset active session to default ID since default session needs recreation
-          this.setActiveSessionId(this.defaultSessionId);
-        }
-        if (
-          this.activeSessionId === newSessionId &&
-          newSessionId !== this.defaultSessionId
-        ) {
-          process.stderr.write(
-            `[SessionManager] WARN - Active session disconnected, resetting to default: ${newSessionId}\n`,
-          );
-          this.setActiveSessionId(this.defaultSessionId);
-        }
+      // Note: v3 doesn't expose browser disconnect events directly
+      // Session lifecycle is managed through Stagehand.close()
 
-        // Purge any screenshots associated with both internal and Browserbase IDs
-        try {
-          clearScreenshotsForSession(newSessionId);
-          const bbId = browserbaseSessionId;
-          if (bbId) {
-            clearScreenshotsForSession(bbId);
-          }
-        } catch (err) {
-          process.stderr.write(
-            `[SessionManager] WARN - Failed to clear screenshots on disconnect for ${newSessionId}: ${
-              err instanceof Error ? err.message : String(err)
-            }\n`,
-          );
-        }
-      });
-
-      // Add cookies to the context if they are provided in the config
+      // Add cookies - v3 Page doesn't have context() method
+      // Cookies should be set via browserbaseSessionCreateParams in constructor
       if (
         config.cookies &&
         Array.isArray(config.cookies) &&
         config.cookies.length > 0
       ) {
-        await this.addCookiesToContext(
-          page.context() as BrowserContext,
-          config.cookies,
+        process.stderr.write(
+          `[SessionManager] NOTE: Cookie injection not yet implemented for v3. Use browserbaseSessionCreateParams.cookies instead.\n`,
         );
       }
 
       const sessionObj: BrowserSession = {
-        browser,
+        browser: null, // v3 doesn't expose Browser directly
         page,
         sessionId: browserbaseSessionId,
         stagehand,
@@ -333,7 +286,7 @@ export class SessionManager {
           // After close, purge any screenshots associated with both internal and Browserbase IDs
           try {
             clearScreenshotsForSession(sessionIdToLog);
-            const bbId = session?.stagehand?.browserbaseSessionID;
+            const bbId = session?.stagehand?.browserbaseSessionId;
             if (bbId) {
               clearScreenshotsForSession(bbId);
             }
@@ -380,8 +333,8 @@ export class SessionManager {
         `[SessionManager] Default session ${sessionId} not found, creating.\n`,
       );
     } else if (
-      !this.defaultBrowserSession.browser.isConnected() ||
-      this.defaultBrowserSession.page.isClosed()
+      !this.defaultBrowserSession.page ||
+      !this.defaultBrowserSession.stagehand
     ) {
       needsReCreation = true;
       process.stderr.write(
@@ -475,7 +428,7 @@ export class SessionManager {
     }
 
     // Validate the found session
-    if (!sessionObj.browser.isConnected() || sessionObj.page.isClosed()) {
+    if (!sessionObj.page || !sessionObj.stagehand) {
       process.stderr.write(
         `[SessionManager] WARN - Found session ${sessionId} is stale, removing.\n`,
       );

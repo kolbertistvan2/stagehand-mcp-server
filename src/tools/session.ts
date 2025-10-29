@@ -81,7 +81,7 @@ async function handleCreateSession(
         apiKey: config.browserbaseApiKey,
       });
 
-      const browserbaseSessionId = session.stagehand.browserbaseSessionID;
+      const browserbaseSessionId = session.stagehand.browserbaseSessionId;
       if (!browserbaseSessionId) {
         throw new Error(
           "Browserbase session ID not found in Stagehand instance",
