@@ -95,12 +95,14 @@ export const configSchema = z
     modelName: z
       .string()
       .optional()
-      .describe("The model to use for Stagehand (default: gemini-2.0-flash)"),
+      .describe(
+        "The model to use for Stagehand (default: google/gemini-2.5-flash)",
+      ),
     modelApiKey: z
       .string()
       .optional()
       .describe(
-        "API key for the custom model provider. Required when using a model other than the default gemini-2.0-flash",
+        "API key for the custom model provider. Required when using a model other than the default google/gemini-2.5-flash",
       ),
     experimental: z
       .boolean()
@@ -110,7 +112,7 @@ export const configSchema = z
   .refine(
     (data) => {
       // If a non-default model is explicitly specified, API key is required
-      if (data.modelName && data.modelName !== "gemini-2.0-flash") {
+      if (data.modelName && data.modelName !== "google/gemini-2.5-flash") {
         return data.modelApiKey !== undefined && data.modelApiKey.length > 0;
       }
       return true;

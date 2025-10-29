@@ -65,13 +65,12 @@ async function handleCreateSession(
 
       if (
         !session ||
-        !session.browser ||
         !session.page ||
         !session.sessionId ||
         !session.stagehand
       ) {
         throw new Error(
-          `SessionManager failed to return a valid session object with actualSessionId for ID: ${targetSessionId}`,
+          `SessionManager failed to return a valid session object for ID: ${targetSessionId}`,
         );
       }
 

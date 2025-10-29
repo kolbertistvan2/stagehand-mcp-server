@@ -216,10 +216,15 @@ new Stagehand({
 
 ```typescript
 new Stagehand({
-  model: "gemini-2.5-flash",
-  // API key automatically detected from env vars!
+  model: "google/gemini-2.5-flash", // v3 uses provider/model format!
+  // API key automatically detected from GEMINI_API_KEY or GOOGLE_API_KEY env vars
 });
 ```
+
+**FONTOS:** v3 a Vercel AI SDK-t használja, ezért a modell névnek **provider/model** formátumúnak kell lennie!
+
+- ✅ Helyes: `"google/gemini-2.5-flash"`
+- ❌ Helytelen: `"gemini-2.5-flash"` (Browserbase API elutasítja)
 
 ### v3 Migration Checklist
 
