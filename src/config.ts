@@ -32,11 +32,11 @@ const defaultConfig: Config = {
     host: undefined,
   },
   viewPort: {
-    browserWidth: 1024,
-    browserHeight: 768,
+    browserWidth: 1920,
+    browserHeight: 1080,
   },
   cookies: undefined,
-  modelName: "gemini-2.0-flash", // Default Model
+  modelName: "gemini-2.5-flash", // Default Model (latest stable)
 };
 
 // Resolve final configuration by merging defaults, file config, and CLI options
