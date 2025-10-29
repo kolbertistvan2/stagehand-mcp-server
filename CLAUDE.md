@@ -4,7 +4,9 @@ Ez a dokumentum azért készült, hogy egy másik Claude Code agent meg tudja é
 
 ## 📋 Projekt Áttekintés
 
-Ez egy **MCP (Model Context Protocol) server**, amely a **Browserbase** felhő böngésző platformot és a **Stagehand** AI-powered browser automation framework-öt kombinálja. A server lehetővé teszi, hogy LLM-ek (Claude, GPT, Gemini) természetes nyelvű parancsokkal vezéreljenek böngészőket.
+Ez egy **MCP (Model Context Protocol) server**, amely a **Browserbase** felhő böngésző platformot és a **Stagehand v3** AI-powered browser automation framework-öt kombinálja. A server lehetővé teszi, hogy LLM-ek (Claude, GPT, Gemini) természetes nyelvű parancsokkal vezéreljenek böngészőket.
+
+**FONTOS**: A projekt **Stagehand v3.0.0**-t használ (2025. január), ami jelentős breaking changes-eket tartalmaz v2-höz képest!
 
 ### Fő komponensek:
 
@@ -84,21 +86,22 @@ if (!mergedConfig.modelApiKey) {
 }
 ```
 
-#### 2. Stagehand Constructor API Key
+#### 2. Stagehand v3 Constructor - Model Parameter
 
-A Stagehand konstruktorban a `modelClientOptions.apiKey` paramétert átadjuk:
+**FONTOS VÁLTOZÁS v3-ban**: A `modelName` + `modelClientOptions` helyett most **egyetlen `model` parameter** van:
 
 ```typescript
-// src/sessionManager.ts - lines 30-35
-modelClientOptions: {
-  apiKey:
-    config.modelApiKey ||
-    process.env.GEMINI_API_KEY ||
-    process.env.GOOGLE_API_KEY,
-},
+// src/sessionManager.ts - line 30
+model: params.modelName || config.modelName || "gemini-2.5-flash",
 ```
 
-**FONTOS**: A `modelClientOptions` **CSAK a Stagehand konstruktorban** van jelen, **NEM** az egyes method hívásokban!
+**v3 automatikusan detektálja az API key-t** a környezeti változókból:
+
+- Google: `GEMINI_API_KEY` vagy `GOOGLE_API_KEY`
+- OpenAI: `OPENAI_API_KEY`
+- Anthropic: `ANTHROPIC_API_KEY`
+
+**NEM KELL** külön `modelClientOptions` objektumot átadni a Google modelleknél!
 
 #### 3. OpenAI és Anthropic Modellek
 
@@ -111,9 +114,130 @@ export type ClientOptions = OpenAIClientOptions | AnthropicClientOptions;
 
 Ezeknek van `apiKey` property-jük, és a Stagehand konstruktorban kell átadni őket.
 
-### ❌ NE TEDD SOHA
+## 🆕 Stagehand v3 Breaking Changes (2025. január)
 
-#### 1. NE változtasd meg az `extract()` method signature-t!
+A projekt **2025. januárjában frissült Stagehand v2.5.2-ről v3.0.0-ra**. Ez **MAJOR breaking change** frissítés volt.
+
+### Fő v3 Változások:
+
+#### 1. API Method Változások
+
+**v2:**
+
+```typescript
+await stagehand.page.act({ action: "click button", variables: {...} });
+await stagehand.page.extract(instruction);
+await stagehand.page.observe({ instruction, returnAction });
+```
+
+**v3:**
+
+```typescript
+await stagehand.act("click button", { variables: {...} });
+await stagehand.extract(instruction);
+await stagehand.observe(instruction);
+```
+
+**Változások:**
+
+- `stagehand.page.act()` → `stagehand.act()` (első paraméter string, nem object!)
+- `stagehand.page.extract()` → `stagehand.extract()`
+- `stagehand.page.observe()` → `stagehand.observe()`
+- `returnAction` paraméter eltávolítva az observe-ból
+
+#### 2. Page Access Változás
+
+**v2:**
+
+```typescript
+const page = stagehand.page; // Playwright Page
+```
+
+**v3:**
+
+```typescript
+const page = stagehand.context.activePage(); // v3 CDP-based Page | undefined
+```
+
+**Fontos különbségek:**
+
+- v3 Page **NEM** Playwright Page, hanem saját CDP-based implementáció
+- `activePage()` visszaad `Page | undefined`-ot
+- Nincs `page.isClosed()` method
+- Nincs `page.context()` method (mint Playwright-ban)
+- DE van: `page.goto()`, `page.screenshot()`, `page.url()`, `page.locator()` stb.
+
+#### 3. Browser Access Változás
+
+**v2:**
+
+```typescript
+const browser = stagehand.browser; // Playwright Browser
+const context = stagehand.context; // Playwright BrowserContext
+```
+
+**v3:**
+
+```typescript
+const context = stagehand.context; // V3Context (NEM Playwright!)
+// Nincs közvetlen browser access!
+```
+
+**v3-ban NEM elérhető**:
+
+- `browser.isConnected()`
+- `browser.on("disconnected", ...)`
+- Playwright `BrowserContext`
+
+#### 4. Property Név Változások
+
+```typescript
+// v2:
+stagehand.browserbaseSessionID;
+
+// v3:
+stagehand.browserbaseSessionId; // Kis 'd'!
+```
+
+#### 5. Model Config Egyszerűsítés
+
+**v2:**
+
+```typescript
+new Stagehand({
+  modelName: "gemini-2.5-flash",
+  modelClientOptions: {
+    apiKey: process.env.GEMINI_API_KEY,
+  },
+});
+```
+
+**v3:**
+
+```typescript
+new Stagehand({
+  model: "gemini-2.5-flash",
+  // API key automatically detected from env vars!
+});
+```
+
+### v3 Migration Checklist
+
+Ha frissítesz v3-ra vagy v3-mal dolgozol:
+
+- [ ] `page.act()` → `act()` (first param is string!)
+- [ ] `page.extract()` → `extract()`
+- [ ] `page.observe()` → `observe()`
+- [ ] `stagehand.page` → `stagehand.context.activePage()`
+- [ ] `browserbaseSessionID` → `browserbaseSessionId`
+- [ ] Remove `page.isClosed()` checks
+- [ ] Remove `browser.isConnected()` checks
+- [ ] Remove browser disconnect handlers
+- [ ] Update `model` config (no modelClientOptions needed for Google)
+
+### ❌ NE TEDD SOHA (v3)
+
+#### 1. NE használd a v2 API syntax-ot!
 
 **HELYES** (commit 00994f70):
 
