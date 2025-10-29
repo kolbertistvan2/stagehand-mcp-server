@@ -8,7 +8,6 @@ import type { ToolActionResult } from "../types/types.js";
  * Docs: https://docs.stagehand.dev/basics/observe
  *
  * This tool is used to observe and identify specific interactive elements on a web page.
- * You can optionally choose to have the observe tool return an action to perform on the element.
  */
 
 const ObserveInputSchema = z.object({
@@ -22,20 +21,13 @@ const ObserveInputSchema = z.object({
         you want to observe. This tool is designed to help you identify interactive elements that you can
         later use with the act tool for performing actions like clicking, typing, or form submission.`,
   ),
-  returnAction: z
-    .boolean()
-    .optional()
-    .describe(
-      `Whether to return the action to perform on the element. If true, the action will be returned as a string.
-       If false, the action will not be returned.`,
-    ),
 });
 
 type ObserveInput = z.infer<typeof ObserveInputSchema>;
 
 const observeSchema: ToolSchema<typeof ObserveInputSchema> = {
   name: "browserbase_stagehand_observe",
-  description: `Find interactive elements on the page from an instruction; optionally return an action.`,
+  description: `Find and identify interactive elements on the page based on an instruction.`,
   inputSchema: ObserveInputSchema,
 };
 
