@@ -60,7 +60,7 @@ export class Context {
       this.currentSessionId,
       this.config,
     );
-    if (session && session.page && !session.page.isClosed()) {
+    if (session && session.page) {
       return session.page;
     }
 
@@ -75,10 +75,9 @@ export class Context {
       this.config,
       createIfMissing,
     );
-    if (!session || !session.browser || !session.browser.isConnected()) {
-      return null;
-    }
-    return session.browser;
+    // v3 doesn't expose Browser directly, return null
+    // Use stagehand instance for browser operations instead
+    return session ? session.browser : null;
   }
 
   async run(tool: MCPTool, args: unknown): Promise<CallToolResult> {
