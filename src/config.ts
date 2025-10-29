@@ -36,7 +36,7 @@ const defaultConfig: Config = {
     browserHeight: 1080,
   },
   cookies: undefined,
-  modelName: "gemini-2.5-flash-preview-04-17", // Default Model
+  modelName: "gemini-2.5-flash", // Default Model
 };
 
 // Resolve final configuration by merging defaults, file config, and CLI options
