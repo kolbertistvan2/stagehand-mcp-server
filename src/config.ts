@@ -35,7 +35,7 @@ const defaultConfig: Config = {
     browserHeight: 1080,
   },
   cookies: undefined,
-  modelName: "gemini-2.5-flash", // Default Model
+  modelName: "google/gemini-2.5-flash", // Default Model - v3 uses provider/model format
 };
 
 // Resolve final configuration by merging defaults, file config, and CLI options

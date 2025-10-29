@@ -27,7 +27,7 @@ export const createStagehandInstance = async (
     env: "BROWSERBASE",
     apiKey,
     projectId,
-    model: params.modelName || config.modelName || "gemini-2.5-flash",
+    model: params.modelName || config.modelName || "google/gemini-2.5-flash",
     ...(params.browserbaseSessionID && {
       browserbaseSessionID: params.browserbaseSessionID,
     }),
