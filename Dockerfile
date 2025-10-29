@@ -8,13 +8,13 @@ WORKDIR /app
 # Copy package files
 COPY package.json pnpm-lock.yaml ./
 
-# Install dependencies
-RUN pnpm install --frozen-lockfile
+# Install dependencies (skip prepare scripts to avoid build errors)
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 # Copy source code
 COPY . .
 
-# Build TypeScript
+# Build TypeScript manually
 RUN pnpm build
 
 # Expose port
