@@ -1,27 +1,24 @@
-FROM node:22-alpine AS builder
+FROM node:20-alpine
 
-RUN corepack enable
+# Install pnpm
+RUN npm install -g pnpm
 
 WORKDIR /app
 
+# Copy package files
 COPY package.json pnpm-lock.yaml ./
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
-    pnpm install --frozen-lockfile --ignore-scripts
 
+# Install dependencies
+RUN pnpm install --frozen-lockfile
+
+# Copy source code
 COPY . .
-RUN pnpm run build && \
-    pnpm prune --prod --ignore-scripts
 
-FROM gcr.io/distroless/nodejs22-debian12
+# Build TypeScript
+RUN pnpm build
 
-LABEL io.modelcontextprotocol.server.name="io.github.browserbase/mcp-server-browserbase"
+# Expose port
+EXPOSE 3000
 
-WORKDIR /app
-
-COPY --from=builder /app/package.json ./
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/cli.js ./cli.js
-COPY --from=builder /app/index.js ./index.js
-
-CMD ["cli.js"]
+# Start command
+CMD ["node", "dist/program.js", "--port", "3000", "--host", "0.0.0.0"]

@@ -1,40 +1,18 @@
-# Dependencies
-node_modules/
-
-# Build output
-dist/
-
-# Tests
-tests/
-evals/
-
-# Git
-.git/
-.gitignore
-
-# Documentation
-*.md
-!README.md
-assets/
-
-# CI/CD
-.github/
-
-# IDE
-.vscode/
-.idea/
-
-# Logs
+node_modules
+dist
+.git
+.github
+.husky
+.env
+.env.*
+!.env.example
 *.log
 npm-debug.log*
-
-# Environment
-.env
-.env.local
-
-# Misc
+pnpm-debug.log*
 .DS_Store
+coverage
+.vscode
+.idea
 *.swp
 *.swo
 *~
-
