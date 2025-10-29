@@ -6,7 +6,7 @@ Ez a dokumentum azért készült, hogy egy másik Claude Code agent meg tudja é
 
 Ez egy **MCP (Model Context Protocol) server**, amely a **Browserbase** felhő böngésző platformot és a **Stagehand v3** AI-powered browser automation framework-öt kombinálja. A server lehetővé teszi, hogy LLM-ek (Claude, GPT, Gemini) természetes nyelvű parancsokkal vezéreljenek böngészőket.
 
-**FONTOS**: A projekt **Stagehand v3.0.0**-t használ (2025. január), ami jelentős breaking changes-eket tartalmaz v2-höz képest!
+**FONTOS**: A projekt **Stagehand v3.0.0**-t használ (2025. október), ami jelentős breaking changes-eket tartalmaz v2-höz képest!
 
 ### Fő komponensek:
 
@@ -114,9 +114,9 @@ export type ClientOptions = OpenAIClientOptions | AnthropicClientOptions;
 
 Ezeknek van `apiKey` property-jük, és a Stagehand konstruktorban kell átadni őket.
 
-## 🆕 Stagehand v3 Breaking Changes (2025. január)
+## 🆕 Stagehand v3 Breaking Changes (2025. október)
 
-A projekt **2025. januárjában frissült Stagehand v2.5.2-ről v3.0.0-ra**. Ez **MAJOR breaking change** frissítés volt.
+A projekt **2025. októberében frissült Stagehand v2.5.2-ről v3.0.0-ra**. Ez **MAJOR breaking change** frissítés volt.
 
 ### Fő v3 Változások:
 
