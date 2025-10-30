@@ -295,7 +295,45 @@ To use advanced stealth, set the --advancedStealth flag in your MCP Config:
 
 Here are our docs on [Contexts](https://docs.browserbase.com/features/contexts)
 
-To use contexts, set the --contextId flag in your MCP Config:
+Contexts allow you to persist cookies, localStorage, and login state across browser sessions. This is useful for maintaining authentication and reducing the need to log in repeatedly.
+
+#### Creating a Context
+
+First, create a Browserbase Context using the API:
+
+```bash
+curl -X POST https://api.browserbase.com/v1/contexts \
+  -H "X-BB-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"projectId": "YOUR_PROJECT_ID"}'
+```
+
+This will return a context ID (UUID format) that you can use in your MCP configuration.
+
+#### Using a Context (Option 1: Environment Variable - Recommended)
+
+Set the `BROWSERBASE_CONTEXT_ID` environment variable:
+
+```json
+{
+  "mcpServers": {
+    "browserbase": {
+      "command": "npx",
+      "args": ["@browserbasehq/mcp-server-browserbase"],
+      "env": {
+        "BROWSERBASE_API_KEY": "",
+        "BROWSERBASE_PROJECT_ID": "",
+        "GEMINI_API_KEY": "",
+        "BROWSERBASE_CONTEXT_ID": "YOUR_CONTEXT_ID"
+      }
+    }
+  }
+}
+```
+
+#### Using a Context (Option 2: CLI Flag)
+
+Alternatively, set the --contextId flag in your MCP Config:
 
 ```json
 {
@@ -305,7 +343,7 @@ To use contexts, set the --contextId flag in your MCP Config:
       "args": [
         "@browserbasehq/mcp-server-browserbase",
         "--contextId",
-        "<YOUR_CONTEXT_ID>"
+        "YOUR_CONTEXT_ID"
       ],
       "env": {
         "BROWSERBASE_API_KEY": "",
@@ -316,6 +354,8 @@ To use contexts, set the --contextId flag in your MCP Config:
   }
 }
 ```
+
+**Note:** All sessions will use `persist: true` by default, meaning any cookies, localStorage, or authentication state will be saved for future sessions.
 
 ### Browser Viewport Sizing
 

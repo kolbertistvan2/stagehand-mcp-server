@@ -47,12 +47,7 @@ export const createStagehandInstance = async (
               id: config.context?.contextId,
               persist: config.context?.persist ?? true,
             }
-          : {
-              // Use global persistent context for session continuity across all MCP sessions
-              // This preserves cookies, localStorage, and login state
-              id: "mcp-persistent-context",
-              persist: true,
-            },
+          : undefined,
         advancedStealth: config.advancedStealth ?? undefined,
       },
       userMetadata: {

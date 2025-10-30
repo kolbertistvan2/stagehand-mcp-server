@@ -37,6 +37,12 @@ const defaultConfig: Config = {
   },
   cookies: undefined,
   modelName: "google/gemini-2.5-flash", // Default Model - v3 uses provider/model format
+  context: process.env.BROWSERBASE_CONTEXT_ID
+    ? {
+        contextId: process.env.BROWSERBASE_CONTEXT_ID,
+        persist: true,
+      }
+    : undefined,
 };
 
 // Resolve final configuration by merging defaults, file config, and CLI options
