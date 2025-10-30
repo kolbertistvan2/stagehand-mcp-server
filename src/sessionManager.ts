@@ -34,6 +34,7 @@ export const createStagehandInstance = async (
     experimental: config.experimental ?? false,
     browserbaseSessionCreateParams: {
       projectId,
+      region: config.region ?? "eu-central-1", // Default to EU region for data privacy and compliance
       proxies: config.proxies,
       keepAlive: config.keepAlive ?? false,
       browserSettings: {
@@ -46,7 +47,12 @@ export const createStagehandInstance = async (
               id: config.context?.contextId,
               persist: config.context?.persist ?? true,
             }
-          : undefined,
+          : {
+              // Use global persistent context for session continuity across all MCP sessions
+              // This preserves cookies, localStorage, and login state
+              id: "mcp-persistent-context",
+              persist: true,
+            },
         advancedStealth: config.advancedStealth ?? undefined,
       },
       userMetadata: {

@@ -24,6 +24,12 @@ export type Config = {
    */
   advancedStealth?: boolean;
   /**
+   * The region where the Browserbase session should run.
+   *
+   * @default "eu-central-1"
+   */
+  region?: "us-west-2" | "us-east-1" | "eu-central-1" | "ap-southeast-1";
+  /**
    * Whether or not to keep the Browserbase session alive
    *
    * @default false

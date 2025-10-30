@@ -26,6 +26,7 @@ const defaultConfig: Config = {
   browserbaseApiKey: process.env.BROWSERBASE_API_KEY ?? "",
   browserbaseProjectId: process.env.BROWSERBASE_PROJECT_ID ?? "",
   proxies: false,
+  region: "eu-central-1", // Default to EU region
   server: {
     port: undefined,
     host: undefined,

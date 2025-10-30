@@ -46,6 +46,12 @@ export const configSchema = z
       .describe(
         "Use advanced stealth mode. Only available to Browserbase Scale Plan users",
       ),
+    region: z
+      .enum(["us-west-2", "us-east-1", "eu-central-1", "ap-southeast-1"])
+      .optional()
+      .describe(
+        "The region where the Browserbase session should run (default: eu-central-1)",
+      ),
     keepAlive: z
       .boolean()
       .optional()
