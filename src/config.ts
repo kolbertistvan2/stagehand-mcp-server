@@ -57,6 +57,14 @@ export async function resolveConfig(cliOptions: CLIOptions): Promise<Config> {
       process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
   }
 
+  // Context env var support - only apply if not already set by CLI
+  if (!mergedConfig.context?.contextId && process.env.BROWSERBASE_CONTEXT_ID) {
+    mergedConfig.context = {
+      contextId: process.env.BROWSERBASE_CONTEXT_ID,
+      persist: true,
+    };
+  }
+
   // --------------------------------
 
   // Basic validation for Browserbase keys - provide dummy values if not set
