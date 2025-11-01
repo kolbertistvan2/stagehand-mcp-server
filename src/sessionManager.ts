@@ -23,6 +23,11 @@ export const createStagehandInstance = async (
     throw new Error("Browserbase API Key and Project ID are required");
   }
 
+  // Debug: Log context configuration
+  process.stderr.write(
+    `[SessionManager] Context config: ${JSON.stringify(config.context)}\n`,
+  );
+
   const stagehand = new Stagehand({
     env: "BROWSERBASE",
     apiKey,
