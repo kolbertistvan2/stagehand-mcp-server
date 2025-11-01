@@ -95,10 +95,13 @@ export async function configFromCLIOptions(
       host: cliOptions.host,
     },
     proxies: cliOptions.proxies,
-    context: {
-      contextId: cliOptions.contextId,
-      persist: cliOptions.persist,
-    },
+    context:
+      cliOptions.contextId || cliOptions.persist !== undefined
+        ? {
+            contextId: cliOptions.contextId,
+            persist: cliOptions.persist,
+          }
+        : undefined,
     viewPort: {
       browserWidth: cliOptions.browserWidth,
       browserHeight: cliOptions.browserHeight,
